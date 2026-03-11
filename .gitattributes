@@ -1,29 +1,101 @@
-# Auto <!DOCTYPE html> <!-- A VERSÃO DO HTML QUE ESTAMOS USANDO -->
-<!-- VERSÃO 5 DO HTML (MAIS MODERNA) -->
-
-<html lang="pt-br">
-
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8"> <!-- PADRÃO DE CARACTERES -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevClub - Gerador de IA</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pergunte e Responda</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width:800px; margin:40px auto; padding:0 20px; }
+    h1 { text-align:center; }
+    #chat { border:1px solid #ddd; padding:12px; height:350px; overflow:auto; background:#fafafa; }
+    .msg { margin:8px 0; }
+    .user { text-align:right; color:#0A4; }
+    .bot { text-align:left; color:#04A; }
+    form { margin-top:12px; display:flex; gap:8px; }
+    input[type="text"] { flex:1; padding:8px; font-size:14px; }
+    button { padding:8px 12px; font-size:14px; }
+    small { color:#666; }
+  </style>
 </head>
-
 <body>
-    <h1>
-        CSS Gerador por IA ⚡️
-    </h1>
+  <h1>Pergunte e Responda</h1>
 
-    <p>
-        Descreva o que você imagina e veja a mágica acontecer
-    </p>
+  <div id="chat" aria-live="polite"></div>
 
-    <!-- area de texto -->
-    <textarea placeholder="Ex: Bola azul pingando"></textarea>
+  <form id="form">
+    <input id="question" type="text" placeholder="Digite sua pergunta..." autocomplete="off" required />
+    <button type="submit">Enviar</button>
+  </form>
 
-    <button>Gerar Código ⚡️</button>
+  <p><small>Dica: teste com perguntas sobre horário, saudação, clima, nome, contar, ou "ajuda".</small></p>
 
+  <script>
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('form');
+    const questionInput = document.getElementById('question');
+
+    function addMessage(text, cls) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + cls;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function generateResponse(q) {
+      const s = q.trim().toLowerCase();
+
+      // respostas simples por palavra-chave
+      if (!s) return "Por favor, escreva uma pergunta.";
+      if (s.includes('olá') || s.includes('oi') || s.includes('bom dia') || s.includes('boa tarde') || s.includes('boa noite')) {
+        return "Olá! Como posso ajudar você hoje?";
+      }
+      if (s.includes('nome')) {
+        return "Eu sou um assistente simples neste site. Como posso ajudar?";
+      }
+      if (s.includes('horário') || s.includes('hora') || s.includes('que horas')) {
+        const now = new Date();
+        return "Agora são " + now.toLocaleTimeString();
+      }
+      if (s.includes('data') || s.includes('dia')) {
+        const today = new Date();
+        return "Hoje é " + today.toLocaleDateString();
+      }
+      if (s.includes('clima') || s.includes('tempo')) {
+        return "Não tenho acesso ao clima em tempo real aqui, mas você pode consultar um serviço de previsão (ex: weather.com).";
+      }
+      if (s.includes('ajuda')) {
+        return "Você pode me perguntar sobre horário, data, saudações, pedir para eu contar, ou perguntar algo simples.";
+      }
+      if (s.match(/conta|conte|contar/) || s.match(/\d+\s*(\+|-|\*|\/)\s*\d+/)) {
+        // tenta avaliar uma expressão matemática simples (cuidado: eval limitado)
+        try {
+          // aceitar apenas números e operadores + - * / . e espaços
+          const safe = s.replace(/[^0-9+\-*/().\s]/g, '');
+          const result = Function('"use strict";return (' + safe + ')')();
+          if (typeof result === 'number' && isFinite(result)) return 'Resultado: ' + result;
+        } catch (e) {}
+        return "Se quiser, escreva uma expressão matemática como 2+2 para eu calcular.";
+      }
+
+      // fallback: resposta genérica
+      return "Desculpe, não entendi exatamente. Pergunte outra coisa ou escreva 'ajuda' para sugestões.";
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const q = questionInput.value;
+      addMessage(q, 'user');
+      questionInput.value = '';
+      // simular pequena espera
+      setTimeout(() => {
+        const resp = generateResponse(q);
+        addMessage(resp, 'bot');
+      }, 300);
+    });
+
+    // foco no campo ao carregar
+    questionInput.focus();
+  </script>
 </body>
-
-</html>detect text files and perform LF normalization
-* text=auto
+</html>
